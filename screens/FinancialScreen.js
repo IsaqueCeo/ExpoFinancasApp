@@ -24,7 +24,7 @@ const movimentacoes = [
   },
 ];
 
-export default function App() {
+export default function FinancialScreen() {
   const renderMovimentacoes = ({ item }) => (
     <View>
       <Text style={styles.date}>{item.date}</Text>

@@ -12,7 +12,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Bem-vindo à tela inicial!</Text>
-      <Button title="Sair" onPress={handleLogout} />
+      <Button title="Logar" onPress={handleLogout} />
     </View>
   );
 };
