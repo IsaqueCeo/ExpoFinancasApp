@@ -5,30 +5,35 @@ import { createStackNavigator } from '@react-navigation/stack';
 import FinancialScreen from './screens/FinancialScreen';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
-import NovaMovimentacaoScreen from './screens/NovaMovimentacao';
 
 
 const Stack = createStackNavigator();
 
 export default function App() {
-  useEffect(() => {
-    const prepare = async () => {
-      try {
-        // Impedir a tela de splash de desaparecer automaticamente
-        await SplashScreen.preventAutoHideAsync();
+  // useEffect(() => {
+  //   const prepare = async () => {
+  //     try {
         
-        // Adicionar um delay de 3 segundos antes de esconder a splash screen
-        await new Promise(resolve => setTimeout(resolve, 3000));
+  //       await SplashScreen.preventAutoHideAsync();
         
-        // Esconder a splash screen
-        await SplashScreen.hideAsync();
-      } catch (e) {
-        console.warn(e);
-      }
-    };
+  //       await new Promise(resolve => setTimeout(resolve, 3000));
+        
+  //       await SplashScreen.hideAsync();
+  //     } catch (e) {
+  //       console.warn(e);
+  //     }
+  //   };
     
-    prepare();
-  }, []);
+  //   prepare();
+  // }, []);
+
+  
+  useEffect(() =>{
+    setTimeout(async()=> {
+      await SplashScreen.hideAsync();
+    },2000)
+  },[])
+
 
   return (
     <NavigationContainer>
@@ -36,7 +41,6 @@ export default function App() {
         <Stack.Screen name='Login' component={LoginScreen} />
         <Stack.Screen name='Home' component={HomeScreen} />
         <Stack.Screen name='Financial' component={FinancialScreen} />
-        <Stack.Screen name='NovaMovimentação' component={NovaMovimentacaoScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

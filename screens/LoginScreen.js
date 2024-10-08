@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, Button, Alert, Image, TouchableOpaci
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Caminho da imagem
-const primoPobreImg = require('../img/primo_pobre.jpg');
+const primoPobreImg = require('../assets/splash.png');
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
