@@ -1,51 +1,56 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const movimentacoes = [
-  {
-    id: '1',
-    date: '12.08.22',
-    items: [
-      { description: 'Hambúrguer', value: '-14,00', isEntry: false },
-      { description: 'Receita xyz', value: '+10,00', isEntry: true },
-      { description: 'Receita abc', value: '+12:30', isEntry: true },
-    ]
-  },
-  {
-    id: '2',
-    date: '11.08.22',
-    items: [
-      { description: 'Supermercado', value: '-190,10', isEntry: false },
-      { description: 'Combustível', value: '-50,12', isEntry: false },
-      { description: 'Padaria', value: '-5,10', isEntry: false },
-      { description: 'Salário', value: '+1600,00', isEntry: true },
-    ]
-  },
-];
+export default function FinancialScreen({ navigation }) {
+  const [movimentacoes, setMovimentacoes] = useState([]);
 
-export default function FinancialScreen() {
+  // Função para carregar as movimentações do AsyncStorage
+  const loadMovimentacoes = async () => {
+    try {
+      const movimentacoesSalvas = await AsyncStorage.getItem('MovimentacoesFinanceiras');
+      if (movimentacoesSalvas) {
+        setMovimentacoes(JSON.parse(movimentacoesSalvas));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar movimentações:', error);
+    }
+  };
+
+  // UseEffect para carregar movimentações ao montar a tela
+  useEffect(() => {
+    loadMovimentacoes();
+  }, []);
+
+  // Função para renderizar as movimentações
   const renderMovimentacoes = ({ item }) => (
     <View>
       <Text style={styles.date}>{item.date}</Text>
-      {item.items.map((mov, index) => (
-        <View key={index} style={styles.movimentacaoContainer}>
-          <Text style={styles.movimentacaoValue}>{mov.value}</Text>
-          <Text style={styles.movimentacaoDescription}>{mov.description}</Text>
-          <View style={[styles.indicator, { backgroundColor: mov.isEntry ? 'green' : 'red' }]} />
-        </View>
-      ))}
+      <ScrollView style={styles.scrollArea}>
+        {item.items.map((mov, index) => (
+          <View key={index} style={styles.movimentacaoContainer}>
+            <Text style={styles.movimentacaoValue}>{mov.value}</Text>
+            <Text style={styles.movimentacaoDescription}>{mov.description}</Text>
+            <View style={[styles.indicator, { backgroundColor: mov.isEntry ? 'green' : 'red' }]} />
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 
   return (
-    <View style={styles.container}>  
+    <View style={styles.container}>
       <LinearGradient colors={['#e5f8e0', '#f5fff5']} style={styles.balanceContainer}>
         <Text style={styles.balanceTitle}>Saldo Atual</Text>
         <Text style={styles.balance}>R$ 97,25</Text>
       </LinearGradient>
 
-      <TouchableOpacity style={styles.addButton}>
+      {/* Botão para adicionar nova movimentação */}
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate('Nova Movimentação')}
+      >
         <Text style={styles.addButtonText}>+ Movimentação</Text>
       </TouchableOpacity>
 
@@ -98,6 +103,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
+  },
+  scrollArea: {
+    maxHeight: 150,
   },
   movimentacaoContainer: {
     flexDirection: 'row',
