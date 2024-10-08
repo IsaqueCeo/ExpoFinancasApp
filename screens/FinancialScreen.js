@@ -13,7 +13,7 @@ export default function FinancialScreen({ navigation, route }) {
       if (movimentacoesSalvas) {
         setMovimentacoes(JSON.parse(movimentacoesSalvas));
       } else {
-        setMovimentacoes([]); // Inicialize como um array vazio
+        setMovimentacoes([]); // Inicializa como array vazio caso não haja dados
       }
 
       const saldo = await AsyncStorage.getItem('SaldoAtual');
@@ -34,15 +34,42 @@ export default function FinancialScreen({ navigation, route }) {
     }
   }, [route.params?.novasMovimentacoes]);
 
-  const renderMovimentacoes = ({ item }) => (
+  const excluirMovimentacao = (movIndex, movItem) => {
+    // Remove a movimentação e atualiza o saldo
+    const novasMovimentacoes = [...movimentacoes];
+    const [removed] = novasMovimentacoes[movIndex].items.splice(movItem, 1);
+
+    // Atualiza o saldo
+    const novoSaldo = removed.isEntry
+      ? saldoAtual - parseFloat(removed.value)
+      : saldoAtual + parseFloat(removed.value);
+
+    // Atualiza o estado
+    setMovimentacoes(novasMovimentacoes);
+    setSaldoAtual(novoSaldo);
+
+    // Salva as alterações no AsyncStorage
+    AsyncStorage.setItem('MovimentacoesFinanceiras', JSON.stringify(novasMovimentacoes));
+    AsyncStorage.setItem('SaldoAtual', novoSaldo.toString());
+  };
+
+  const renderMovimentacoes = ({ item, index: movIndex }) => (
     <View>
       <Text style={styles.date}>{item.date}</Text>
       <ScrollView style={styles.scrollArea}>
-        {Array.isArray(item.items) ? item.items.map((mov, index) => (
-          <View key={index} style={styles.movimentacaoContainer}>
-            <Text style={styles.movimentacaoValue}>{mov.value}</Text>
+        {Array.isArray(item.items) ? item.items.map((mov, movItemIndex) => (
+          <View key={movItemIndex} style={styles.movimentacaoContainer}>
+            <Text style={styles.movimentacaoValue}>R$ {mov.value}</Text>
             <Text style={styles.movimentacaoDescription}>{mov.description}</Text>
             <View style={[styles.indicator, { backgroundColor: mov.isEntry ? 'green' : 'red' }]} />
+            
+            {/* Botão para excluir a movimentação */}
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => excluirMovimentacao(movIndex, movItemIndex)}
+            >
+              <Text style={styles.deleteButtonText}>Excluir</Text>
+            </TouchableOpacity>
           </View>
         )) : null}
       </ScrollView>
@@ -74,7 +101,7 @@ export default function FinancialScreen({ navigation, route }) {
         <FlatList
           data={movimentacoes}
           renderItem={renderMovimentacoes}
-          keyExtractor={(item) => item.id.toString()} // Certifique-se de que o id seja uma string
+          keyExtractor={(item) => item.id.toString()}
         />
       )}
     </View>
@@ -146,6 +173,16 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
+  },
+  deleteButton: {
+    backgroundColor: '#ff6666',
+    padding: 10,
+    borderRadius: 10,
+    marginLeft: 10,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 14,
   },
   noDataText: {
     textAlign: 'center',
