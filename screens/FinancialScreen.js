@@ -30,7 +30,6 @@ export default function FinancialScreen({ navigation, route }) {
     }
   }, [route.params?.novasMovimentacoes]);
 
-  // Função para renderizar as movimentações
   const renderMovimentacoes = ({ item }) => (
     <View>
       <Text style={styles.date}>{item.date}</Text>
