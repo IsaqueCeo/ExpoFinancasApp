@@ -39,19 +39,16 @@ export default function FinancialScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Saldo Atual */}
+    <View style={styles.container}>  
       <LinearGradient colors={['#e5f8e0', '#f5fff5']} style={styles.balanceContainer}>
         <Text style={styles.balanceTitle}>Saldo Atual</Text>
         <Text style={styles.balance}>R$ 97,25</Text>
       </LinearGradient>
 
-      {/* Botão de Movimentação */}
       <TouchableOpacity style={styles.addButton}>
         <Text style={styles.addButtonText}>+ Movimentação</Text>
       </TouchableOpacity>
 
-      {/* Lista de Movimentações */}
       <FlatList
         data={movimentacoes}
         renderItem={renderMovimentacoes}
