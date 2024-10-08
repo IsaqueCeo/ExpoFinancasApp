@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from '
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function FinancialScreen({ navigation }) {
+export default function FinancialScreen({ navigation, route }) {
   const [movimentacoes, setMovimentacoes] = useState([]);
 
   // Função para carregar as movimentações do AsyncStorage
@@ -12,6 +12,8 @@ export default function FinancialScreen({ navigation }) {
       const movimentacoesSalvas = await AsyncStorage.getItem('MovimentacoesFinanceiras');
       if (movimentacoesSalvas) {
         setMovimentacoes(JSON.parse(movimentacoesSalvas));
+      } else {
+        setMovimentacoes([]); // Se não houver movimentações, define como array vazio
       }
     } catch (error) {
       console.error('Erro ao carregar movimentações:', error);
@@ -22,6 +24,16 @@ export default function FinancialScreen({ navigation }) {
   useEffect(() => {
     loadMovimentacoes();
   }, []);
+
+  // UseEffect para verificar se novas movimentações foram cadastradas
+  useEffect(() => {
+    if (route.params?.novasMovimentacoes) {
+      // Atualiza o estado com novas movimentações
+      setMovimentacoes(route.params.novasMovimentacoes);
+      // Atualiza o AsyncStorage com as novas movimentações
+      AsyncStorage.setItem('MovimentacoesFinanceiras', JSON.stringify(route.params.novasMovimentacoes));
+    }
+  }, [route.params?.novasMovimentacoes]);
 
   // Função para renderizar as movimentações
   const renderMovimentacoes = ({ item }) => (
@@ -54,11 +66,15 @@ export default function FinancialScreen({ navigation }) {
         <Text style={styles.addButtonText}>+ Movimentação</Text>
       </TouchableOpacity>
 
-      <FlatList
-        data={movimentacoes}
-        renderItem={renderMovimentacoes}
-        keyExtractor={(item) => item.id}
-      />
+      {movimentacoes.length === 0 ? (
+        <Text style={styles.noDataText}>Nenhuma movimentação cadastrada.</Text>
+      ) : (
+        <FlatList
+          data={movimentacoes}
+          renderItem={renderMovimentacoes}
+          keyExtractor={(item) => item.id}
+        />
+      )}
     </View>
   );
 }
@@ -131,5 +147,10 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
+  },
+  noDataText: {
+    textAlign: 'center',
+    color: '#999',
+    fontSize: 16,
   },
 });

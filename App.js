@@ -37,10 +37,10 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Login'>
-        <Stack.Screen name='Login' component={LoginScreen} />
+      <Stack.Navigator initialRouteName='Home'>
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name='Home' component={HomeScreen} />
-        <Stack.Screen name='Financial' component={FinancialScreen} />
+        <Stack.Screen name="FinancialScreen" component={FinancialScreen} />
         <Stack.Screen name="Nova Movimentação" component={NovaMovimentacaoScreen} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -21,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     if (username === 'admin' && password === '1234') {
       await AsyncStorage.setItem('loggedIn', 'true');
-      navigation.replace('Financial');
+      navigation.replace('FinancialScreen');
     } else {
       Alert.alert('Erro', 'Usuário ou senha inválidos!');
     }
