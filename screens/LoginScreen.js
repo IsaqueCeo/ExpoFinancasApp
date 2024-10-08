@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TextInput, Button, Alert, Image, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Caminho da imagem
 const primoPobreImg = require('../assets/splash.png');
 
 const LoginScreen = ({ navigation }) => {
@@ -10,7 +9,6 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    // Verifica se o usuário já está logado
     const checkLoginStatus = async () => {
       const loggedIn = await AsyncStorage.getItem('loggedIn');
       if (loggedIn === 'true') {
@@ -59,15 +57,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center", // Alinha o conteúdo no centro horizontal
+    alignItems: "center",
     paddingHorizontal: 20,
-    backgroundColor: '#f0f4f7', // Cor de fundo suave
+    backgroundColor: '#f0f4f7',
   },
   image: {
-    width: 150, // Ajuste o tamanho da imagem
+    width: 150,
     height: 150,
-    borderRadius: 75, // Torna a imagem circular
-    resizeMode: 'cover', // Cobre o espaço da imagem mantendo a proporção
+    borderRadius: 75,
+    resizeMode: 'cover',
     marginBottom: 30,
   },
   title: {
