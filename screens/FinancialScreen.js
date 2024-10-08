@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function FinancialScreen({ navigation, route }) {
   const [movimentacoes, setMovimentacoes] = useState([]);
+  const [saldoAtual, setSaldoAtual] = useState(0);
 
   const loadMovimentacoes = async () => {
     try {
@@ -12,8 +13,11 @@ export default function FinancialScreen({ navigation, route }) {
       if (movimentacoesSalvas) {
         setMovimentacoes(JSON.parse(movimentacoesSalvas));
       } else {
-        setMovimentacoes([]);
+        setMovimentacoes([]); // Inicialize como um array vazio
       }
+
+      const saldo = await AsyncStorage.getItem('SaldoAtual');
+      setSaldoAtual(saldo ? parseFloat(saldo) : 0);
     } catch (error) {
       console.error('Erro ao carregar movimentações:', error);
     }
@@ -34,22 +38,27 @@ export default function FinancialScreen({ navigation, route }) {
     <View>
       <Text style={styles.date}>{item.date}</Text>
       <ScrollView style={styles.scrollArea}>
-        {item.items.map((mov, index) => (
+        {Array.isArray(item.items) ? item.items.map((mov, index) => (
           <View key={index} style={styles.movimentacaoContainer}>
             <Text style={styles.movimentacaoValue}>{mov.value}</Text>
             <Text style={styles.movimentacaoDescription}>{mov.description}</Text>
             <View style={[styles.indicator, { backgroundColor: mov.isEntry ? 'green' : 'red' }]} />
           </View>
-        ))}
+        )) : null}
       </ScrollView>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#e5f8e0', '#f5fff5']} style={styles.balanceContainer}>
+      <LinearGradient
+        colors={saldoAtual >= 0 ? ['#e5f8e0', '#f5fff5'] : ['#ffe6e6', '#fff5f5']}
+        style={[styles.balanceContainer, { borderColor: saldoAtual >= 0 ? '#6FCF97' : '#ff6666' }]}
+      >
         <Text style={styles.balanceTitle}>Saldo Atual</Text>
-        <Text style={styles.balance}>R$ 97,25</Text>
+        <Text style={[styles.balance, { color: saldoAtual >= 0 ? 'green' : 'red' }]}>
+          R$ {saldoAtual.toFixed(2)}
+        </Text>
       </LinearGradient>
 
       <TouchableOpacity
@@ -65,7 +74,7 @@ export default function FinancialScreen({ navigation, route }) {
         <FlatList
           data={movimentacoes}
           renderItem={renderMovimentacoes}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()} // Certifique-se de que o id seja uma string
         />
       )}
     </View>
@@ -79,11 +88,9 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   balanceContainer: {
-    backgroundColor: '#f5fff5',
     padding: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#6FCF97',
     alignItems: 'center',
     marginBottom: 20,
   },
@@ -94,7 +101,6 @@ const styles = StyleSheet.create({
   balance: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
   },
   addButton: {
     backgroundColor: '#333',

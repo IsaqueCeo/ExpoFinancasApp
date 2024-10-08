@@ -38,6 +38,13 @@ export default function NovaMovimentacao({ navigation }) {
         });
       }
 
+      // Calcular o saldo atual
+      let saldoAtual = await AsyncStorage.getItem('SaldoAtual');
+      saldoAtual = saldoAtual ? parseFloat(saldoAtual) : 0;
+
+      const novoSaldo = isEntry ? saldoAtual + valor : saldoAtual - valor;
+      await AsyncStorage.setItem('SaldoAtual', novoSaldo.toString());
+
       await AsyncStorage.setItem('MovimentacoesFinanceiras', JSON.stringify(movimentacoes));
 
       navigation.navigate('FinancialScreen');
@@ -68,6 +75,8 @@ export default function NovaMovimentacao({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Nova Movimentação</Text>
+      
       <TextInput
         style={styles.input}
         placeholder="Descrição"
@@ -75,59 +84,67 @@ export default function NovaMovimentacao({ navigation }) {
         onChangeText={setDescricao}
       />
 
-      <TouchableOpacity onPress={showDatePickerHandler} style={styles.input}>
-        <Text>{date.toLocaleDateString('pt-BR')}</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display="default"
-          onChange={onChangeDate}
-        />
-      )}
+      <View style={styles.dateTimeContainer}>
+        <TouchableOpacity onPress={showDatePickerHandler} style={[styles.input, styles.dateInput]}>
+          <Text>{date.toLocaleDateString('pt-BR')}</Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="default"
+            onChange={onChangeDate}
+          />
+        )}
 
-      <TouchableOpacity onPress={showTimePickerHandler} style={styles.input}>
-        <Text>{date.toLocaleTimeString('pt-BR')}</Text>
-      </TouchableOpacity>
-      {showTimePicker && (
-        <DateTimePicker
-          value={date}
-          mode="time"
-          display="default"
-          onChange={onChangeTime}
-        />
-      )}
+        <TouchableOpacity onPress={showTimePickerHandler} style={[styles.input, styles.timeInput]}>
+          <Text>{date.toLocaleTimeString('pt-BR')}</Text>
+        </TouchableOpacity>
+        {showTimePicker && (
+          <DateTimePicker
+            value={date}
+            mode="time"
+            display="default"
+            onChange={onChangeTime}
+          />
+        )}
+      </View>
 
       <CurrencyInput
-        style={styles.input}
         value={valor}
         onChangeValue={setValor}
-        prefix="R$ "
+        style={styles.input}
+        placeholder="Valor"
+        unit="R$"
         delimiter="."
         separator=","
         precision={2}
-        placeholder="Valor"
-        keyboardType="numeric"
       />
 
-      <View style={styles.row}>
+      <View style={styles.entryExitContainer}>
         <TouchableOpacity
-          style={[styles.button, isEntry ? styles.activeButtonGreen : styles.inactiveButton]}
           onPress={() => setIsEntry(true)}
+          style={[styles.entryExitButton, isEntry && styles.selectedButton]}
         >
-          <Text style={styles.textButton}>Receita</Text>
+          <View style={styles.radioButtonContainer}>
+            <View style={[styles.radioButton, { backgroundColor: 'green' }]} />
+            <Text style={styles.entryExitButtonText}>Receita</Text>
+          </View>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.button, !isEntry ? styles.activeButtonRed : styles.inactiveButton]}
           onPress={() => setIsEntry(false)}
+          style={[styles.entryExitButton, !isEntry && styles.selectedButton]}
         >
-          <Text style={styles.textButton}>Despesa</Text>
+          <View style={styles.radioButtonContainer}>
+            <View style={[styles.radioButton, { backgroundColor: 'red' }]} />
+            <Text style={styles.entryExitButtonText}>Despesa</Text>
+          </View>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.buttonCadastrar} onPress={salvarMovimentacao}>
-        <Text style={styles.textButtonCadastrar}>Cadastrar</Text>
+      <TouchableOpacity style={styles.saveButton} onPress={salvarMovimentacao}>
+        <Text style={styles.saveButtonText}>Cadastrar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -137,51 +154,72 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f9f9f9',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   input: {
-    height: 50,
-    borderColor: '#ccc',
+    padding: 15,
     borderWidth: 1,
+    borderColor: '#ccc',
     borderRadius: 10,
-    marginBottom: 15,
-    paddingHorizontal: 10,
+    marginBottom: 10,
     backgroundColor: '#fff',
-    justifyContent: 'center',
   },
-  row: {
+  dateTimeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  button: {
+  dateInput: {
+    flex: 1,
+    marginRight: 10,
+  },
+  timeInput: {
+    flex: 1,
+  },
+  entryExitContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  entryExitButton: {
     flex: 1,
     padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
     marginHorizontal: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
-  activeButtonGreen: {
-    backgroundColor: '#28a745',
+  selectedButton: {
+    borderColor: '#6200ee',
   },
-  activeButtonRed: {
-    backgroundColor: '#dc3545',
+  entryExitButtonText: {
+    fontSize: 16,
+    color: '#333',
   },
-  inactiveButton: {
-    backgroundColor: '#ccc',
+  radioButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  buttonCadastrar: {
-    backgroundColor: '#000',
+  radioButton: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  saveButton: {
+    backgroundColor: '#333',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginTop: 20,
   },
-  textButton: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  textButtonCadastrar: {
+  saveButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
