@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import CurrencyInput from 'react-native-currency-input'; // Biblioteca para formatar moeda
+import CurrencyInput from 'react-native-currency-input';
 
 export default function NovaMovimentacao({ navigation }) {
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState(null);
-  const [isEntry, setIsEntry] = useState(true); // True para receita, false para despesa
+  const [isEntry, setIsEntry] = useState(true);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // Função para salvar a movimentação
   const salvarMovimentacao = async () => {
     try {
-      // Carrega as movimentações já salvas
       const movimentacoesSalvas = await AsyncStorage.getItem('MovimentacoesFinanceiras');
       let movimentacoes = movimentacoesSalvas ? JSON.parse(movimentacoesSalvas) : [];
 
-      // Adiciona a nova movimentação
       const novaMovimentacao = {
-        id: (movimentacoes.length + 1).toString(), // Adicione o id aqui
+        id: (movimentacoes.length + 1).toString(),
         description: descricao,
         value: valor,
         isEntry: isEntry,
@@ -29,56 +26,48 @@ export default function NovaMovimentacao({ navigation }) {
         time: date.toLocaleTimeString('pt-BR'),
       };
 
-      // Adiciona a nova movimentação no array de movimentações da data atual (ou cria nova data)
       const hoje = date.toLocaleDateString('pt-BR');
       const dataExistente = movimentacoes.find(mov => mov.date === hoje);
       if (dataExistente) {
         dataExistente.items.push(novaMovimentacao);
       } else {
         movimentacoes.push({
-          id: (movimentacoes.length + 1).toString(), // Altere este id para o correto
+          id: (movimentacoes.length + 1).toString(),
           date: hoje,
           items: [novaMovimentacao],
         });
       }
 
-      // Salva de volta no AsyncStorage
       await AsyncStorage.setItem('MovimentacoesFinanceiras', JSON.stringify(movimentacoes));
 
-      // Navega de volta para a tela de movimentações
       navigation.navigate('FinancialScreen');
     } catch (error) {
       console.error('Erro ao salvar movimentação:', error);
     }
   };
 
-  // Função para abrir o seletor de data
   const showDatePickerHandler = () => {
     setShowDatePicker(true);
   };
 
-  // Função para abrir o seletor de hora
   const showTimePickerHandler = () => {
     setShowTimePicker(true);
   };
 
-  // Função para selecionar a data
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === 'ios'); // Para iOS
     setDate(currentDate);
+    setShowDatePicker(false);
   };
 
-  // Função para selecionar a hora
   const onChangeTime = (event, selectedTime) => {
     const currentTime = selectedTime || date;
-    setShowTimePicker(Platform.OS === 'ios'); // Para iOS
     setDate(currentTime);
+    setShowTimePicker(false);
   };
 
   return (
     <View style={styles.container}>
-      {/* Campo de Descrição */}
       <TextInput
         style={styles.input}
         placeholder="Descrição"
@@ -86,7 +75,6 @@ export default function NovaMovimentacao({ navigation }) {
         onChangeText={setDescricao}
       />
 
-      {/* Campo de Data */}
       <TouchableOpacity onPress={showDatePickerHandler} style={styles.input}>
         <Text>{date.toLocaleDateString('pt-BR')}</Text>
       </TouchableOpacity>
@@ -99,7 +87,6 @@ export default function NovaMovimentacao({ navigation }) {
         />
       )}
 
-      {/* Campo de Hora */}
       <TouchableOpacity onPress={showTimePickerHandler} style={styles.input}>
         <Text>{date.toLocaleTimeString('pt-BR')}</Text>
       </TouchableOpacity>
@@ -112,7 +99,6 @@ export default function NovaMovimentacao({ navigation }) {
         />
       )}
 
-      {/* Campo de Valor formatado */}
       <CurrencyInput
         style={styles.input}
         value={valor}
@@ -125,7 +111,6 @@ export default function NovaMovimentacao({ navigation }) {
         keyboardType="numeric"
       />
 
-      {/* Botões para Receita ou Despesa */}
       <View style={styles.row}>
         <TouchableOpacity
           style={[styles.button, isEntry ? styles.activeButtonGreen : styles.inactiveButton]}
@@ -141,7 +126,6 @@ export default function NovaMovimentacao({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Botão para cadastrar a movimentação */}
       <TouchableOpacity style={styles.buttonCadastrar} onPress={salvarMovimentacao}>
         <Text style={styles.textButtonCadastrar}>Cadastrar</Text>
       </TouchableOpacity>
@@ -177,16 +161,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   activeButtonGreen: {
-    backgroundColor: '#28a745', // Verde para receita
+    backgroundColor: '#28a745',
   },
   activeButtonRed: {
-    backgroundColor: '#dc3545', // Vermelho para despesa
+    backgroundColor: '#dc3545',
   },
   inactiveButton: {
     backgroundColor: '#ccc',
   },
   buttonCadastrar: {
-    backgroundColor: '#000', // Preto para cadastrar
+    backgroundColor: '#000',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

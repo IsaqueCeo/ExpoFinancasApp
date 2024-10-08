@@ -4,8 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ navigation }) => {
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('loggedIn'); // Remove o status de login
-    navigation.navigate('LoginScreen'); // Navega para a tela de Login
+    await AsyncStorage.removeItem('loggedIn');
+    navigation.navigate('LoginScreen');
   };
 
   return (
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 60,
     borderRadius: 25,
-    marginBottom: 20, // Adiciona espaço abaixo do botão
+    marginBottom: 20,
   },
   loginButtonText: {
     color: '#fff',

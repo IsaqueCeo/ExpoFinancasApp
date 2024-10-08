@@ -6,31 +6,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function FinancialScreen({ navigation, route }) {
   const [movimentacoes, setMovimentacoes] = useState([]);
 
-  // Função para carregar as movimentações do AsyncStorage
   const loadMovimentacoes = async () => {
     try {
       const movimentacoesSalvas = await AsyncStorage.getItem('MovimentacoesFinanceiras');
       if (movimentacoesSalvas) {
         setMovimentacoes(JSON.parse(movimentacoesSalvas));
       } else {
-        setMovimentacoes([]); // Se não houver movimentações, define como array vazio
+        setMovimentacoes([]);
       }
     } catch (error) {
       console.error('Erro ao carregar movimentações:', error);
     }
   };
 
-  // UseEffect para carregar movimentações ao montar a tela
   useEffect(() => {
     loadMovimentacoes();
   }, []);
 
-  // UseEffect para verificar se novas movimentações foram cadastradas
   useEffect(() => {
     if (route.params?.novasMovimentacoes) {
-      // Atualiza o estado com novas movimentações
       setMovimentacoes(route.params.novasMovimentacoes);
-      // Atualiza o AsyncStorage com as novas movimentações
       AsyncStorage.setItem('MovimentacoesFinanceiras', JSON.stringify(route.params.novasMovimentacoes));
     }
   }, [route.params?.novasMovimentacoes]);
@@ -58,7 +53,6 @@ export default function FinancialScreen({ navigation, route }) {
         <Text style={styles.balance}>R$ 97,25</Text>
       </LinearGradient>
 
-      {/* Botão para adicionar nova movimentação */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('Nova Movimentação')}
