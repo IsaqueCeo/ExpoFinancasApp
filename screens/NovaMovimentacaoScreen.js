@@ -38,7 +38,6 @@ export default function NovaMovimentacao({ navigation }) {
         });
       }
 
-      // Calcular o saldo atual
       let saldoAtual = await AsyncStorage.getItem('SaldoAtual');
       saldoAtual = saldoAtual ? parseFloat(saldoAtual) : 0;
 

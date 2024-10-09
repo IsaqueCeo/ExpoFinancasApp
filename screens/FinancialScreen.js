@@ -13,7 +13,7 @@ export default function FinancialScreen({ navigation, route }) {
       if (movimentacoesSalvas) {
         setMovimentacoes(JSON.parse(movimentacoesSalvas));
       } else {
-        setMovimentacoes([]); // Inicializa como array vazio caso não haja dados
+        setMovimentacoes([]);
       }
 
       const saldo = await AsyncStorage.getItem('SaldoAtual');
@@ -35,20 +35,17 @@ export default function FinancialScreen({ navigation, route }) {
   }, [route.params?.novasMovimentacoes]);
 
   const excluirMovimentacao = (movIndex, movItem) => {
-    // Remove a movimentação e atualiza o saldo
+
     const novasMovimentacoes = [...movimentacoes];
     const [removed] = novasMovimentacoes[movIndex].items.splice(movItem, 1);
 
-    // Atualiza o saldo
     const novoSaldo = removed.isEntry
       ? saldoAtual - parseFloat(removed.value)
       : saldoAtual + parseFloat(removed.value);
 
-    // Atualiza o estado
     setMovimentacoes(novasMovimentacoes);
     setSaldoAtual(novoSaldo);
 
-    // Salva as alterações no AsyncStorage
     AsyncStorage.setItem('MovimentacoesFinanceiras', JSON.stringify(novasMovimentacoes));
     AsyncStorage.setItem('SaldoAtual', novoSaldo.toString());
   };
@@ -63,7 +60,6 @@ export default function FinancialScreen({ navigation, route }) {
             <Text style={styles.movimentacaoDescription}>{mov.description}</Text>
             <View style={[styles.indicator, { backgroundColor: mov.isEntry ? 'green' : 'red' }]} />
             
-            {/* Botão para excluir a movimentação */}
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => excluirMovimentacao(movIndex, movItemIndex)}
