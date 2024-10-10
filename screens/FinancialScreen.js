@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from '
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function FinancialScreen({ navigation, route }) {
   const [movimentacoes, setMovimentacoes] = useState([]);
@@ -93,7 +94,7 @@ export default function FinancialScreen({ navigation, route }) {
               style={styles.deleteButton}
               onPress={() => excluirMovimentacao(movIndex, movItemIndex)}
             >
-              <Text style={styles.deleteButtonText}>Excluir</Text>
+              <Text style={styles.deleteButtonText}><FontAwesome name="trash" size={24} color="black" /></Text>
             </TouchableOpacity>
           </View>
         )) : null}
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   deleteButton: {
-    backgroundColor: '#ff6666',
+    // backgroundColor: '#ff6666',
     padding: 10,
     borderRadius: 10,
     marginLeft: 10,
