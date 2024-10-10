@@ -7,41 +7,43 @@ import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import NovaMovimentacaoScreen from './screens/NovaMovimentacaoScreen';
 import CadastroScreen from './screens/CadastroScreen';
+import { TouchableOpacity, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
 
 const Stack = createStackNavigator();
 
 export default function App() {
-  // useEffect(() => {
-  //   const prepare = async () => {
-  //     try {
-        
-  //       await SplashScreen.preventAutoHideAsync();
-        
-  //       await new Promise(resolve => setTimeout(resolve, 3000));
-        
-  //       await SplashScreen.hideAsync();
-  //     } catch (e) {
-  //       console.warn(e);
-  //     }
-  //   };
-    
-  //   prepare();
-  // }, []);
-
-  
-  useEffect(() =>{
-    setTimeout(async()=> {
+  useEffect(() => {
+    setTimeout(async() => {
       await SplashScreen.hideAsync();
-    },2000)
-  },[])
+    }, 2000);
+  }, []);
 
+  const handleLogout = async (navigation) => {
+    await AsyncStorage.removeItem('loggedIn');
+    navigation.replace('Home');
+  };
 
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Home'>
-      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name='Home' component={HomeScreen} />
-        <Stack.Screen name="FinancialScreen" component={FinancialScreen} />
+        <Stack.Screen 
+          name="FinancialScreen" 
+          component={FinancialScreen}
+          options={({ navigation }) => ({
+            title: 'Financial',
+            headerRight: () => (
+              <TouchableOpacity onPress={() => handleLogout(navigation)}>
+                <Text style={{ marginRight: 10 }}><MaterialCommunityIcons name="logout" size={24} color="black" /></Text>
+              </TouchableOpacity>
+            ),
+            headerTitleAlign: 'left',
+          })}
+        />
         <Stack.Screen name="Nova Movimentação" component={NovaMovimentacaoScreen} />
         <Stack.Screen name="CadastroScreen" component={CadastroScreen} />
       </Stack.Navigator>
