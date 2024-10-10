@@ -74,7 +74,7 @@ export default function NovaMovimentacao({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Nova Movimentação</Text>
+      {/* <Text style={styles.title}>Nova Movimentação</Text> */}
       
       <TextInput
         style={styles.input}
