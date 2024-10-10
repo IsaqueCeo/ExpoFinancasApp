@@ -19,7 +19,10 @@ const LoginScreen = ({ navigation }) => {
   }, [navigation]);
 
   const handleLogin = async () => {
-    if (username === 'admin' && password === '1234') {
+    const storedAdmin = await AsyncStorage.getItem('admin');
+    const storedPassword = await AsyncStorage.getItem('senha');
+
+    if (username === storedAdmin && password === storedPassword) {
       await AsyncStorage.setItem('loggedIn', 'true');
       navigation.replace('FinancialScreen');
     } else {
