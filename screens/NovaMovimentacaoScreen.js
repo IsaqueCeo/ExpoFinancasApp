@@ -74,8 +74,6 @@ export default function NovaMovimentacao({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Nova Movimentação</Text> */}
-      
       <TextInput
         style={styles.input}
         placeholder="Descrição"
@@ -142,9 +140,18 @@ export default function NovaMovimentacao({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.saveButton} onPress={salvarMovimentacao}>
-        <Text style={styles.saveButtonText}>Cadastrar</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.saveButton} onPress={salvarMovimentacao}>
+          <Text style={styles.saveButtonText}>Cadastrar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.saveButton, { backgroundColor: '#f00' }]} 
+          onPress={() => navigation.navigate('FinancialScreen')}
+        >
+          <Text style={styles.saveButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -154,12 +161,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f9f9f9',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
   },
   input: {
     padding: 15,
@@ -212,11 +213,17 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginRight: 8,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   saveButton: {
     backgroundColor: '#333',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+    flex: 1,
+    marginRight: 10,
   },
   saveButtonText: {
     color: '#fff',
