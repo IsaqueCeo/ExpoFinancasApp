@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function FinancialScreen({ navigation, route }) {
   const [movimentacoes, setMovimentacoes] = useState([]);
@@ -11,33 +12,61 @@ export default function FinancialScreen({ navigation, route }) {
     try {
       const movimentacoesSalvas = await AsyncStorage.getItem('MovimentacoesFinanceiras');
       if (movimentacoesSalvas) {
-        setMovimentacoes(JSON.parse(movimentacoesSalvas));
+        const parsedMovimentacoes = JSON.parse(movimentacoesSalvas);
+        setMovimentacoes(parsedMovimentacoes);
+        calcularSaldo(parsedMovimentacoes);
       } else {
         setMovimentacoes([]);
+        setSaldoAtual(0);
       }
-
-      const saldo = await AsyncStorage.getItem('SaldoAtual');
-      setSaldoAtual(saldo ? parseFloat(saldo) : 0);
     } catch (error) {
       console.error('Erro ao carregar movimentações:', error);
     }
   };
 
-  useEffect(() => {
-    loadMovimentacoes();
-  }, []);
+  const calcularSaldo = (movs = []) => {
+    if (!Array.isArray(movs)) {
+      movs = [];
+    }
+  
+    const saldo = movs.reduce((acc, item) => {
+      if (!Array.isArray(item.items)) {
+        item.items = [];
+      }
+  
+      const totalMovItem = item.items.reduce((itemAcc, mov) => {
+        return itemAcc + (mov.isEntry ? parseFloat(mov.value) : -parseFloat(mov.value));
+      }, 0);
+  
+      return acc + totalMovItem;
+    }, 0);
+  
+    setSaldoAtual(saldo);
+    AsyncStorage.setItem('SaldoAtual', saldo.toString());
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadMovimentacoes();
+    }, [])
+  );
 
   useEffect(() => {
     if (route.params?.novasMovimentacoes) {
-      setMovimentacoes(route.params.novasMovimentacoes);
-      AsyncStorage.setItem('MovimentacoesFinanceiras', JSON.stringify(route.params.novasMovimentacoes));
+      const novasMovimentacoes = [...movimentacoes, route.params.novasMovimentacoes];
+      setMovimentacoes(novasMovimentacoes);
+      AsyncStorage.setItem('MovimentacoesFinanceiras', JSON.stringify(novasMovimentacoes));
+      calcularSaldo(novasMovimentacoes);
     }
   }, [route.params?.novasMovimentacoes]);
 
-  const excluirMovimentacao = (movIndex, movItem) => {
-
+  const excluirMovimentacao = (movIndex, movItemIndex) => {
     const novasMovimentacoes = [...movimentacoes];
-    const [removed] = novasMovimentacoes[movIndex].items.splice(movItem, 1);
+    const [removed] = novasMovimentacoes[movIndex].items.splice(movItemIndex, 1);
+
+    if (novasMovimentacoes[movIndex].items.length === 0) {
+      novasMovimentacoes.splice(movIndex, 1);
+    }
 
     const novoSaldo = removed.isEntry
       ? saldoAtual - parseFloat(removed.value)
@@ -97,7 +126,7 @@ export default function FinancialScreen({ navigation, route }) {
         <FlatList
           data={movimentacoes}
           renderItem={renderMovimentacoes}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.date.toString()}
         />
       )}
     </View>
