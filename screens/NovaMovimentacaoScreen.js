@@ -111,7 +111,7 @@ export default function NovaMovimentacao({ navigation }) {
         value={valor}
         onChangeValue={setValor}
         style={styles.input}
-        placeholder="Valor"
+        placeholder="R$ 0,00"
         unit="R$"
         delimiter="."
         separator=","
