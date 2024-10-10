@@ -20,8 +20,8 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.loginButtonText}>Logar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
-        <Text style={styles.registerText}>Já sou cadastrado</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('CadastroScreen')}>
+        <Text style={styles.loginButtonText}>Cadastro de Usuário</Text>
       </TouchableOpacity>
     </View>
   );
@@ -59,11 +59,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  registerText: {
-    color: '#000',
-    fontSize: 14,
-    marginTop: 20,
-  },
+  // registerText: {
+  //   color: '#000',
+  //   fontSize: 14,
+  //   marginTop: 20,
+  // },
 });
 
 export default HomeScreen;
